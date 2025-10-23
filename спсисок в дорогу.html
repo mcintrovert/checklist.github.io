@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHECK-ЛИСТ ПУТЕШЕСТВЕННИКА</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+
+        .form-card h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            font-size: 15px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        select.error {
+            border-color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.05);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .packing-list {
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .packing-list::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .packing-list.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .category {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .category h3 {
+            color: white;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .item:hover {
+            background: rgba(255,255,255,1);
+            transform: translateY(-1px);
+        }
+
+        .item.checked {
+            background: rgba(212, 237, 218, 0.9);
+            border-left-color: #28a745;
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+
+        .checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #3498db;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .item.checked .checkbox {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .item.checked .checkbox::after {
+            content: "✓";
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .progress {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-text {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            transition: width 0.3s ease;
+        }
+
+        .final-message {
+            text-align: center;
+            margin-top: 25px;
+            padding: 18px;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9));
+            color: white;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Яркие тематические фоны с рисунками */
+        .beach-theme {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .beach-theme::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,60 Q40,40 60,60 T100,60 L100,100 L0,100 L0,60 Z" fill="white"/><circle cx="30" cy="30" r="8" fill="white"/><circle cx="60" cy="25" r="5" fill="white"/></svg>');
+            background-size: 200px;
+        }
+
+        .mountains-theme {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .mountains-theme::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,70 L20,40 L40,60 L60,30 L80,50 L100,20 L100,100 L0,100 Z" fill="white"/></svg>');
+            background-size: 150px;
+        }
+
+        .city-theme {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+        .city-theme::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="40" width="8" height="40" fill="white"/><rect x="25" y="30" width="10" height="50" fill="white"/><rect x="45" y="20" width="12" height="60" fill="white"/><rect x="65" y="35" width="9" height="45" fill="white"/><rect x="82" y="25" width="8" height="55" fill="white"/></svg>');
+            background-size: 120px;
+        }
+
+        .camping-theme {
+            background: linear-gradient(135deg, #a8e6cf 0%, #3bb78f 100%);
+        }
+        .camping-theme::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,20 20,60 80,60" fill="white"/><rect x="47" y="60" width="6" height="20" fill="white"/></svg>');
+            background-size: 100px;
+        }
+
+        .nature-theme {
+            background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
+        }
+        .nature-theme::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M40,50 Q50,30 60,50 T80,50 L80,70 L40,70 Z" fill="white"/><circle cx="30" cy="40" r="12" fill="white"/><circle cx="70" cy="35" r="8" fill="white"/></svg>');
+            background-size: 180px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CHECK-ЛИСТ ПУТЕШЕСТВЕННИКА</h1>
+            <p class="tagline">Ничего не забудь в дорогу!</p>
+        </header>
+
+        <main>
+            <form id="tripForm" class="form-card">
+                <h2>Расскажи о своей поездке</h2>
+                
+                <div class="form-group">
+                    <label>С кем едешь?</label>
+                    <select id="companion" required>
+                        <option value="">я еду...</option>
+                        <option value="solo">Один/Одна</option>
+                        <option value="family">С семьей (дети)</option>
+                        <option value="couple">Со второй половинкой</option>
+                        <option value="friends">С друзьями</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Длительность поездки</label>
+                    <select id="longtrip" required>
+                        <option value="">моё путешествие будет длиться...</option>
+                        <option value="1">1 день</option>
+                        <option value="3">Выходные (2-3 дня)</option>
+                        <option value="7">Неделя (5-7 дней)</option>
+                        <option value="14">Две недели</option>
+                        <option value="30">Месяц и больше</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Транспорт</label>
+                    <select id="transport" required>
+                        <option value="">я еду на...</option>
+                        <option value="car">Автомобиль</option>
+                        <option value="train">Поезд</option>
+                        <option value="plane">Самолёт</option>
+                        <option value="bus">Автобус</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Погода в месте поездки</label>
+                    <select id="weather" required>
+                        <option value="">там, куда я еду будет...</option>
+                        <option value="hot">Жарко и солнечно</option>
+                        <option value="warm">Тепло</option>
+                        <option value="cool">Прохладно</option>
+                        <option value="cold">Холодно</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Тип поездки</label>
+                    <select id="tripType" required>
+                        <option value="">место моего путешествия...</option>
+                        <option value="beach">Пляжный отдых</option>
+                        <option value="mountains">Горы/Природа</option>
+                        <option value="city">Городской туризм</option>
+                        <option value="camping">Кемпинг</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Собрать чемодан! 🎒</button>
+            </form>
+
+            <div id="packingList" class="packing-list"></div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('tripForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Убираем предыдущие подсветки ошибок
+            const allSelects = document.querySelectorAll('select');
+            allSelects.forEach(select => {
+                select.classList.remove('error');
+            });
+            
+            // Проверяем все поля
+            const companion = document.getElementById('companion');
+            const longtrip = document.getElementById('longtrip');
+            const transport = document.getElementById('transport');
+            const weather = document.getElementById('weather');
+            const tripType = document.getElementById('tripType');
+            
+            let hasErrors = false;
+            
+            if (!companion.value) {
+                companion.classList.add('error');
+                hasErrors = true;
+            }
+            
+            if (!longtrip.value) {
+                longtrip.classList.add('error');
+                hasErrors = true;
+            }
+            
+            if (!transport.value) {
+                transport.classList.add('error');
+                hasErrors = true;
+            }
+            
+            if (!weather.value) {
+                weather.classList.add('error');
+                hasErrors = true;
+            }
+            
+            if (!tripType.value) {
+                tripType.classList.add('error');
+                hasErrors = true;
+            }
+            
+            // Если есть ошибки - выходим
+            if (hasErrors) {
+                // Плавная прокрутка к первому ошибочному полю
+                const firstError = document.querySelector('select.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center'
+                    });
+                }
+                return;
+            }
+            
+            // Если все поля заполнены - генерируем список
+            const formData = {
+                companion: companion.value,
+                duration: parseInt(longtrip.value),
+                transport: transport.value,
+                weather: weather.value,
+                tripType: tripType.value
+            };
+            
+            generatePackingList(formData);
+        });
+
+        // Убираем подсветку ошибки при выборе значения
+        const allSelects = document.querySelectorAll('select');
+        allSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    this.classList.remove('error');
+                }
+            });
+        });
+
+        function generatePackingList(data) {
+            const listContainer = document.getElementById('packingList');
+            
+            // Очищаем предыдущий список
+            listContainer.innerHTML = '';
+            
+            // Устанавливаем тему фона
+            setBackgroundTheme(listContainer, data.tripType);
+            
+            // Генерируем категории с учетом длительности и транспорта
+            const categories = [
+                {
+                    title: '📄 Документы и деньги',
+                    items: generateDocumentsList(data)
+                },
+                {
+                    title: '📱 Электроника',
+                    items: ['Телефон', 'Зарядные устройства', 'Power bank', 'Наушники']
+                },
+                {
+                    title: '👕 Одежда',
+                    items: generateClothesList(data)
+                },
+                {
+                    title: '🧴 Гигиена',
+                    items: generateHygieneList(data)
+                },
+                {
+                    title: '💊 Аптечка',
+                    items: ['Пластырь', 'Обезболивающее', 'Активированный уголь', 'Лекарства, которые принимаете обычно']
+                },
+                {
+                    title: getTransportTitle(data.transport),
+                    items: generateTransportItems(data.transport)
+                },
+                {
+                    title: '⭐ Особые вещи',
+                    items: generateSpecialItems(data)
+                }
+            ];
+            
+            // Добавляем прогресс-бар
+            const progressHTML = `
+                <div class="progress">
+                    <div class="progress-text">Готовность: <span id="progressCount">0</span> из <span id="totalCount">0</span> вещей</div>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+            listContainer.innerHTML = progressHTML;
+            
+            // Генерируем HTML для каждой категории
+            categories.forEach(category => {
+                if (category.items.length > 0) {
+                    const categoryHTML = `
+                        <div class="category">
+                            <h3>${category.title}</h3>
+                            <div class="items-grid">
+                                ${category.items.map(item => `
+                                    <div class="item" onclick="toggleItem(this)">
+                                        <div class="checkbox"></div>
+                                        <span class="item-text">${item}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    listContainer.innerHTML += categoryHTML;
+                }
+            });
+            
+            // Добавляем финальное сообщение
+            const finalMessage = document.createElement('div');
+            finalMessage.className = 'final-message';
+            finalMessage.innerHTML = getFinalMessage();
+            listContainer.appendChild(finalMessage);
+            
+            // Обновляем счетчик
+            updateProgress();
+            
+            // Показываем список
+            listContainer.classList.add('visible');
+            
+            // Прокручиваем к списку
+            listContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateDocumentsList(data) {
+            let documents = ['Паспорт', 'Копии документов','Деньги/Карты', 'Бронь отеля', ];
+            
+            // Логика для транспорта
+            if (data.transport === 'car') {
+                documents.push('Водительские права', 'Страховка', 'Документы на авто');
+            } else if (data.transport === 'train' || data.transport === 'plane' || data.transport === 'bus') {
+                documents.push('Билеты');
+            }
+            
+            return documents;
+        }
+
+        function toggleItem(element) {
+            element.classList.toggle('checked');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const items = document.querySelectorAll('.item');
+            const checkedItems = document.querySelectorAll('.item.checked');
+            const totalCount = items.length;
+            const checkedCount = checkedItems.length;
+            const progressPercent = totalCount > 0 ? (checkedCount / totalCount) * 100 : 0;
+            
+            document.getElementById('progressCount').textContent = checkedCount;
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+        }
+
+        function setBackgroundTheme(container, tripType) {
+            const themeMap = {
+                'beach': 'beach-theme',
+                'mountains': 'mountains-theme',
+                'city': 'city-theme',
+                'camping': 'camping-theme'
+            };
+            
+            container.className = 'packing-list visible ' + (themeMap[tripType] || 'nature-theme');
+        }
+
+        function generateClothesList(data) {
+            let clothes = [];
+            
+            // Расчет количества вещей по длительности с округлением вверх
+            const underwearCount = Math.ceil(data.duration);
+            const socksCount = Math.ceil(data.duration);
+            const tshirtsCount = Math.ceil(data.duration / 2);
+            const sweatersCount = Math.ceil(data.duration / 3);
+            const pantsCount = Math.ceil(data.duration / 4);
+            
+            // Базовые вещи (всегда)
+            clothes.push(`Нижнее белье (${underwearCount} комплектов на человека)`);
+            clothes.push(`Носки (${socksCount} пар на человека)`);
+            clothes.push(`Футболки (${tshirtsCount} шт на человека)`);
+            
+            // Одежда по погоде (БЕЗ ДУБЛЕЙ - только то, что не рассчитано выше)
+            if (data.weather === 'hot') {
+                clothes.push('Шорты', 'Сандалии', 'Головной убор');
+            } else if (data.weather === 'warm') {
+                clothes.push('Кроссовки (1 пара на человека)');
+                clothes.push(`Штаны/Джинсы (${pantsCount} шт на человека)`);
+            } else if (data.weather === 'cool') {
+                clothes.push('Закрытая обувь', 'Ветровка');
+                clothes.push(`Толстовки / кофты (${sweatersCount} шт на человека)`);
+                clothes.push(`Штаны/Джинсы (${pantsCount} шт на человека)`);
+            } else if (data.weather === 'cold') {
+                clothes.push('Теплая куртка', 'Шапка', 'Шарф', 'Перчатки', 'Термобелье');
+                clothes.push(`Толстовки / кофты (${sweatersCount} шт на человека)`);
+                clothes.push(`Штаны/Джинсы (${pantsCount} шт на человека)`);
+            }
+            
+            // Специальная одежда для типа поездки
+            if (data.tripType === 'beach') {
+                clothes.push('Купальник/Плавки', 'Пляжное полотенце', 'Шлепанцы');
+            }
+            
+            return clothes;
+        }
+
+        function generateHygieneList(data) {
+            let hygiene = ['Зубная щетка', 'Зубная паста', 'Расческа', 'Дезодорант'];
+            
+            if (data.duration >= 5) {
+                hygiene.push('Шампунь', 'Гель для душа', 'Бритва', 'Крем для лица');
+            }
+            
+            if (data.duration >= 10) {
+                hygiene.push('Ножницы для ногтей', 'Крем для рук', 'Гигиеническая помада');
+            }
+            
+            return hygiene;
+        }
+
+        function getTransportTitle(transport) {
+            const titles = {
+                'car': '🚗 Для автомобиля',
+                'train': '🚂 Для поезда',
+                'plane': '✈️ Для самолёта',
+                'bus': '🚌 Для автобуса'
+            };
+            return titles[transport];
+        }
+
+        function generateTransportItems(transport) {
+            const items = {
+                'car': ['Аптечка автомобильная', 'Бутылка воды', 'Плед'],
+                'train': ['Еда в дорогу', 'Книга/Планшет', 'Подушка-подголовник', 'Тапочки'],
+                'plane': ['Прозрачный пакет для жидкостей', 'Подушка для шеи', 'Жевательная резинка'],
+                'bus': ['Плед', 'Еда', 'Влажные салфетки', 'Плеер с музыкой']
+            };
+            return items[transport] || [];
+        }
+
+        function generateSpecialItems(data) {
+            let special = [];
+            
+            if (data.tripType === 'beach') {
+                special.push('Солнцезащитный крем', 'Очки от солнца', 'Пляжный зонт');
+            } else if (data.tripType === 'mountains') {
+                special.push('Треккинговые палки', 'Термос', 'Энергетические батончики');
+            } else if (data.tripType === 'city') {
+                special.push('Путеводитель', 'Карта города', 'Удобная обувь для ходьбы');
+            } else if (data.tripType === 'camping') {
+                special.push('Фонарик', 'Спички', 'Нож', 'Палатка', 'Спальник');
+            }
+            
+            if (data.companion === 'family') {
+                special.push('Игры для детей', 'Детское питание', 'Влажные салфетки');
+            } else if (data.companion === 'friends') {
+                special.push('Настольные игры', 'Колонка Bluetooth');
+            }
+            
+            return special;
+        }
+
+        function getFinalMessage() {
+            const messages = [
+                "🎒 Отличных сборов и приятного путешествия!",
+                "🌟 Пусть дорога будет лёгкой, а впечатления - яркими!",
+                "🚀 Счастливого пути и незабываемых приключений!",
+                "📸 Хорошей поездки и классных фотографий!",
+                "🌍 Новых открытий и прекрасных воспоминаний!"
+            ];
+            
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+    </script>
+</body>
+</html>
